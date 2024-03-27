@@ -1,0 +1,100 @@
+To-Do List Application Features:
+Add a Task: Users can add tasks to their to-do list.
+View Tasks: Users can view their current tasks.
+Mark Task as Completed: Users can mark tasks as completed.
+Delete Task: Users can delete tasks from the list.
+Save and Load Tasks: Tasks should persist between sessions.
+Update Task Description or Due Date: Users can modify task details.
+
+Implementation:
+
+class Task:
+    def __init__(self, description, due_date):
+        self.description = description
+        self.due_date = due_date
+        self.completed = False
+
+    def mark_completed(self):
+        self.completed = True
+
+    def __str__(self):
+        status = "Done" if self.completed else "Pending"
+        return f"{self.description} (Due: {self.due_date}) - {status}"
+
+
+class ToDoList:
+    def __init__(self):
+        self.tasks = []
+
+    def add_task(self, task):
+        self.tasks.append(task)
+
+    def delete_task(self, index):
+        del self.tasks[index]
+
+    def mark_task_completed(self, index):
+        self.tasks[index].mark_completed()
+
+    def __str__(self):
+        return "\n".join([f"{i+1}. {task}" for i, task in enumerate(self.tasks)])
+Main Program:
+import pickle
+
+def save_tasks(todo_list):
+    with open("tasks.pkl", "wb") as f:
+        pickle.dump(todo_list, f)
+
+def load_tasks():
+    try:
+        with open("tasks.pkl", "rb") as f:
+            return pickle.load(f)
+    except FileNotFoundError:
+        return ToDoList()
+
+def main():
+    todo_list = load_tasks()
+
+    while True:
+        print("\n===== To-Do List Menu =====")
+        print("1. View Tasks")
+        print("2. Add Task")
+        print("3. Mark Task as Completed")
+        print("4. Delete Task")
+        print("5. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            print("===== Tasks =====")
+            print(todo_list)
+
+        elif choice == "2":
+            description = input("Enter task description: ")
+            due_date = input("Enter due date (optional): ")
+            task = Task(description, due_date)
+            todo_list.add_task(task)
+            save_tasks(todo_list)
+            print("Task added successfully.")
+
+        elif choice == "3":
+            index = int(input("Enter the index of the task to mark as completed: ")) - 1
+            todo_list.mark_task_completed(index)
+            save_tasks(todo_list)
+            print("Task marked as completed.")
+
+        elif choice == "4":
+            index = int(input("Enter the index of the task to delete: ")) - 1
+            todo_list.delete_task(index)
+            save_tasks(todo_list)
+            print("Task deleted successfully.")
+
+        elif choice == "5":
+            print("Exiting...")
+            break
+
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    main()
+
